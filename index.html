@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário — As Epístolas de João</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-hover: #1b5e20;
+            --background: #f4f6f8;
+            --card: #ffffff;
+            --text: #333333;
+            --border: #dddddd;
+            --correct: #e8f5e9;
+            --incorrect: #ffebee;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            font-weight: normal;
+        }
+
+        .instructions {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--primary);
+            padding: 12px 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .user-info {
+            margin-bottom: 25px;
+        }
+
+        .user-info label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .user-info input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .question-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #fff;
+            transition: background 0.3s;
+        }
+
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .options label {
+            display: block;
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .options label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        #result {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        .btn-whatsapp {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .btn-whatsapp:hover {
+            background: #128c7e;
+        }
+
+        /* Feedback visual após correção */
+        .correct-answer {
+            background-color: var(--correct) !important;
+            border-color: #a5d6a7 !important;
+        }
+
+        .incorrect-answer {
+            background-color: var(--incorrect) !important;
+            border-color: #ef9a9a !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Questionário — As Epístolas de João</h1>
+    <h2>1ª, 2ª e 3ª Epístola de João</h2>
+
+    <div class="instructions">
+        <strong>Instruções:</strong> Preencha seu nome, responda a todas as 20 questões e clique no botão ao final para ver seu resultado e compartilhar a pontuação pelo WhatsApp.
+    </div>
+
+    <form id="quizForm">
+        <div class="user-info">
+            <label for="studentName">Nome Completo do Aluno:</label>
+            <input type="text" id="studentName" placeholder="Digite seu nome..." required>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <button type="button" class="btn-submit" onclick="gradeQuiz()">Finalizar e Corrigir Prova</button>
+    </form>
+
+    <div id="result">
+        <h2>Resultado Final</h2>
+        <div class="score-display" id="scoreText"></div>
+        <p id="feedbackMessage"></p>
+        <a id="whatsappBtn" class="btn-whatsapp" target="_blank" href="#">Enviar Resultado pelo WhatsApp</a>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    // 1ª Epístola
+    {
+        q: "1. Segundo 1 João 1:1–4, qual é o propósito principal apresentado pelo autor ao testemunhar acerca de Cristo?",
+        options: [
+            "Demonstrar a superioridade da Lei de Moisés",
+            "Defender a tradição judaica diante dos gentios",
+            "Testemunhar acerca da Palavra da Vida e promover comunhão com Deus e com os apóstolos",
+            "Apresentar uma nova estrutura para a igreja",
+            "Explicar exclusivamente a escatologia cristã"
+        ],
+        answer: 2
+    },
+    {
+        q: "2. Em 1 João 1:5–7, a metáfora de Deus como “luz” está principalmente relacionada:",
+        options: [
+            "À prosperidade material",
+            "À santidade, verdade e comunhão com Deus",
+            "À capacidade intelectual dos cristãos",
+            "À manifestação de milagres",
+            "À liderança espiritual"
+        ],
+        answer: 1
+    },
+    {
+        q: "3. Qual é a relação estabelecida em 1 João entre confessar os pecados e a ação de Deus?",
+        options: [
+            "A confissão elimina a necessidade de arrependimento",
+            "A confissão é desnecessária para quem possui fé",
+            "Deus é fiel e justo para perdoar e purificar aqueles que confessam seus pecados",
+            "O perdão depende exclusivamente de obras religiosas",
+            "O pecado deixa de existir após a conversão"
+        ],
+        answer: 2
+    },
+    {
+        q: "4. Em 1 João 2:15–17, o que o autor apresenta como incompatível com o amor ao Pai?",
+        options: [
+            "O conhecimento",
+            "O trabalho",
+            "O amor ao mundo e às coisas que nele há",
+            "A comunhão entre irmãos",
+            "A oração"
+        ],
+        answer: 2
+    },
+    {
+        q: "5. Em 1 João 2:18–27, o termo “anticristo” está associado principalmente:",
+        options: [
+            "Aos governantes políticos do Império Romano",
+            "Àqueles que negam a identidade de Jesus como Cristo",
+            "Aos pagãos que nunca ouviram o evangelho",
+            "Aos pobres da comunidade",
+            "Aos líderes do templo de Jerusalém"
+        ],
+        answer: 1
+    },
+    {
+        q: "6. De acordo com 1 João 3:1–3, qual é uma das consequências da esperança na futura manifestação de Cristo?",
+        options: [
+            "O abandono da vida comunitária",
+            "A busca por riquezas",
+            "A purificação da vida daquele que espera em Cristo",
+            "A rejeição do mundo físico",
+            "A superioridade sobre outros cristãos"
+        ],
+        answer: 2
+    },
+    {
+        q: "7. Segundo 1 João 3:16–18, como o amor cristão deve ser demonstrado?",
+        options: [
+            "Exclusivamente por meio de palavras",
+            "Por conhecimento teológico",
+            "Por atitudes concretas de amor e auxílio ao irmão necessitado",
+            "Pela separação completa da sociedade",
+            "Por manifestações públicas de religiosidade"
+        ],
+        answer: 2
+    },
+    {
+        q: "8. Em 1 João 4:1, qual orientação o autor oferece à comunidade diante de diferentes manifestações espirituais?",
+        options: [
+            "Aceitar toda manifestação espiritual",
+            "Rejeitar qualquer manifestação espiritual",
+            "Provar os espíritos para verificar se procedem de Deus",
+            "Seguir somente líderes mais antigos",
+            "Buscar experiências sobrenaturais"
+        ],
+        answer: 2
+    },
+    {
+        q: "9. Qual afirmação resume adequadamente o ensino de 1 João 4:7–8?",
+        options: [
+            "O conhecimento é superior ao amor",
+            "O amor é uma característica secundária da fé",
+            "Quem ama demonstra conhecimento de Deus, pois Deus é amor",
+            "O amor é destinado somente aos membros da igreja",
+            "O amor elimina a necessidade da verdade"
+        ],
+        answer: 2
+    },
+    {
+        q: "10. Segundo 1 João 5:11–13, qual é o fundamento da certeza da vida eterna?",
+        options: [
+            "A quantidade de boas obras realizadas",
+            "A riqueza espiritual do indivíduo",
+            "O testemunho de Deus acerca de seu Filho",
+            "A posição ocupada na igreja",
+            "A ausência absoluta de dificuldades"
+        ],
+        answer: 2
+    },
+    // 2ª Epístola
+    {
+        q: "11. Em 2 João 4–6, como o autor relaciona verdade e amor?",
+        options: [
+            "São conceitos incompatíveis",
+            "O amor substitui a verdade",
+            "A verdade deve ser abandonada em favor da tolerância",
+            "Amor e verdade estão inseparavelmente relacionados à obediência aos mandamentos de Deus",
+            "A verdade é necessária somente aos líderes"
+        ],
+        answer: 3
+    },
+    {
+        q: "12. Em 2 João 7, qual erro doutrinário é destacado como especialmente perigoso?",
+        options: [
+            "Negar a existência de anjos",
+            "Negar que Jesus Cristo veio em carne",
+            "Rejeitar a prática do jejum",
+            "Rejeitar o Antigo Testamento",
+            "Não participar das reuniões da igreja"
+        ],
+        answer: 1
+    },
+    {
+        q: "13. Qual é a advertência de 2 João 8–9 à comunidade cristã?",
+        options: [
+            "Não trabalhar excessivamente",
+            "Não perder aquilo que foi conquistado e permanecer na doutrina de Cristo",
+            "Não viajar para outras cidades",
+            "Não receber estrangeiros",
+            "Não ensinar novos convertidos"
+        ],
+        answer: 1
+    },
+    {
+        q: "14. Em 2 João 10–11, por que o autor orienta os cristãos a terem cautela com determinados mestres?",
+        options: [
+            "Porque eram estrangeiros",
+            "Porque eram pobres",
+            "Porque promoviam uma doutrina contrária à de Cristo",
+            "Porque não pertenciam à mesma cidade",
+            "Porque não possuíam formação acadêmica"
+        ],
+        answer: 2
+    },
+    // 3ª Epístola
+    {
+        q: "15. Em 3 João 2, qual preocupação o autor manifesta em relação a Gaio?",
+        options: [
+            "Apenas sua situação financeira",
+            "Sua saúde, prosperidade e bem-estar, juntamente com sua vida espiritual",
+            "Sua posição política",
+            "Sua formação rabínica",
+            "Sua liderança militar"
+        ],
+        answer: 1
+    },
+    {
+        q: "16. Segundo 3 João 3–4, qual característica de Gaio é destacada pelos irmãos que deram testemunho acerca dele?",
+        options: [
+            "Sua riqueza",
+            "Sua influência política",
+            "Sua fidelidade à verdade",
+            "Sua capacidade administrativa",
+            "Sua eloquência"
+        ],
+        answer: 2
+    },
+    {
+        q: "17. Em 3 João 5–8, por que o apoio aos missionários cristãos é considerado importante?",
+        options: [
+            "Porque eles buscavam reconhecimento pessoal",
+            "Porque a comunidade deveria cooperar com aqueles que trabalhavam em favor do nome de Cristo",
+            "Porque era uma obrigação política",
+            "Porque garantia benefícios financeiros",
+            "Porque substituía a evangelização"
+        ],
+        answer: 1
+    },
+    {
+        q: "18. Quem é apresentado em 3 João como exemplo negativo de comportamento dentro da comunidade?",
+        options: [
+            "Gaio",
+            "Demétrio",
+            "Diótrefes",
+            "João Batista",
+            "Timóteo"
+        ],
+        answer: 2
+    },
+    {
+        q: "19. Qual comportamento de Diótrefes é explicitamente criticado em 3 João 9–10?",
+        options: [
+            "Sua falta de conhecimento bíblico",
+            "Seu desejo de exercer primazia, sua rejeição aos irmãos e sua oposição aos que queriam recebê-los",
+            "Sua pobreza",
+            "Sua ausência nas reuniões",
+            "Sua prática missionária"
+        ],
+        answer: 1
+    },
+    {
+        q: "20. Considerando conjuntamente 1, 2 e 3 João, qual conjunto apresenta melhor síntese dos principais temas das três epístolas?",
+        options: [
+            "Poder político, riqueza e guerra",
+            "Verdade, amor, obediência, discernimento doutrinário e comunhão cristã",
+            "Genealogias, leis cerimoniais e sacrifícios",
+            "Escatologia, política romana e filosofia grega",
+            "Prosperidade, milagres e liderança institucional"
+        ],
+        answer: 1
+    }
+];
+
+// Renderiza as perguntas na tela
+function renderQuiz() {
+    const container = document.getElementById("questionsContainer");
+    quizData.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+        card.id = `q-card-${index}`;
+
+        let optionsHtml = "";
+        const letters = ["A", "B", "C", "D", "E"];
+        
+        q.options.forEach((opt, optIdx) => {
+            optionsHtml += `
+                <label id="label-${index}-${optIdx}">
+                    <input type="radio" name="q${index}" value="${optIdx}">
+                    <strong>${letters[optIdx]})</strong> ${opt}
+                </label>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="question-title">${q.q}</div>
+            <div class="options">${optionsHtml}</div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Corrige o formulário
+function gradeQuiz() {
+    const studentName = document.getElementById("studentName").value.trim();
+    if (!studentName) {
+        alert("Por favor, digite seu nome completo antes de corrigir a prova.");
+        return;
+    }
+
+    let score = 0;
+    const total = quizData.length;
+
+    quizData.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const correctOpt = q.answer;
+
+        // Limpa estilos anteriores
+        for(let i=0; i<q.options.length; i++) {
+            document.getElementById(`label-${index}-${i}`).classList.remove('correct-answer', 'incorrect-answer');
+        }
+
+        // Destaca a resposta correta
+        document.getElementById(`label-${index}-${correctOpt}`).classList.add('correct-answer');
+
+        if (selected) {
+            const userVal = parseInt(selected.value);
+            if (userVal === correctOpt) {
+                score++;
+            } else {
+                document.getElementById(`label-${index}-${userVal}`).classList.add('incorrect-answer');
+            }
+        }
+    });
+
+    // Exibe resultados
+    const scoreText = `${score} de ${total} acertos (${((score / total) * 100).toFixed(0)}%)`;
+    document.getElementById("scoreText").innerText = scoreText;
+
+    let feedback = "";
+    if (score === total) feedback = "Excelente! Você demonstrou domínio completo sobre as Epístolas de João.";
+    else if (score >= 14) feedback = "Muito bom! Excelente aproveitamento na leitura bíblica.";
+    else feedback = "Recomenda-se fazer uma releitura atenta das 3 Epístolas de João para fixação dos temas.";
+    
+    document.getElementById("feedbackMessage").innerText = feedback;
+    document.getElementById("result").style.display = "block";
+
+    // Prepara link do WhatsApp
+    const message = `*Resultado da Prova — As Epístolas de João*%0A` +
+                    `*Aluno:* ${studentName}%0A` +
+                    `*Pontuação:* ${score}/${total} (${((score / total) * 100).toFixed(0)}%)%0A%0A` +
+                    `_Enviado via App de Provas Bíblicas_`;
+    
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${message}`;
+    document.getElementById("whatsappBtn").href = whatsappUrl;
+
+    // Rola a página até o resultado
+    document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
+}
+
+// Inicializa a exibição
+renderQuiz();
+</script>
+
+</body>
+</html>
